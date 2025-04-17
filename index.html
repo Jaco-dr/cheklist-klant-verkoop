@@ -135,8 +135,17 @@
         y += 4;
       });
 
-      doc.save('checklist_verkoop.pdf');
+      if (opmerkingen.trim()) {
+        doc.setFontSize(12);
+        doc.text("Opmerkingen:", 10, y);
+        y += 7;
+        const splitText = doc.splitTextToSize(opmerkingen, 180);
+        doc.text(splitText, 12, y);
+      }
+
+      doc.save('checklist_werktekeningen.pdf');
     }
+
 
     function resetChecklist() {
       document.querySelectorAll('input[type="checkbox"]').forEach(box => box.checked = false);
