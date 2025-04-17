@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checklist Klanttekening Verkoop</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 2rem;
+      background: #f9f9f9;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    .section {
+      margin-bottom: 2rem;
+    }
+    label {
+      display: block;
+      margin: 0.3rem 0;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 0.3rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .input-group {
+      margin-bottom: 2rem;
+    }
+    .input-group label {
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
+    .input-group input {
+      padding: 0.3rem;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Checklist Klanttekening Verkoop</h1>
+
+  <div class="input-group">
+    <label for="order">Ordernummer:</label>
+    <input type="text" id="order" placeholder="Bijv. 12345">
+    <label for="klant">Klantnaam:</label>
+    <input type="text" id="klant" placeholder="Bijv. Jansen BV">
+  </div>
+
+  <div id="checklist">
+    <div class="section">
+      <h2>Deur</h2>
+      <label><input type="checkbox"> Type deur gecontroleerd</label>
+      <label><input type="checkbox"> Dagmaat hoogte gecontroleerd</label>
+      <label><input type="checkbox"> Dagmaat breedte gecontroleerd</label>
+      <label><input type="checkbox"> Verloop in hoogte & breedte gecontroleerd</label>
+      <label><input type="checkbox"> Nog te plaatsen vloerafwerking gecontroleerd (indien van toepassing)</label>
+      <label><input type="checkbox"> Kaderprofiel gecontroleerd</label>
+      <label><input type="checkbox"> Liggerprofiel gecontroleerd</label>
+      <label><input type="checkbox"> Handgreep gecontroleerd</label>
+    </div>
+
+    <div class="section">
+      <h2>Glas</h2>
+      <label><input type="checkbox"> Glasopsluiting gecontroleerd</label>
+      <label><input type="checkbox"> Glassoort (kleur en dikte) gecontroleerd</label>
+    </div>
+
+    <div class="section">
+      <h2>Overig</h2>
+      <label><input type="checkbox"> Coating kleur gecontroleerd</label>
+      <label><input type="checkbox"> Behandeling gecontroleerd (indien van toepassing)</label>
+      <label><input type="checkbox"> Extra opties gecontroleerd (zoals sluitstrip, valdorpel, deurdranger)</label>
+    </div>
+
+    <div class="section">
+      <h2>Documentatie</h2>
+      <label><input type="checkbox"> Klanttekening + mailcontact etc. is in Syntri geüpload onder het juiste ordernummer</label>
+      <label><input type="checkbox"> Overbodige/oude info in Syntri verplaatst naar "Archief"</label>
+      <label><input type="checkbox"> Gecontroleerd of pdf vanuit Syntri de meest recente is</label>
+      <label><input type="checkbox"> Order staat in Syntri op "Tekening gemaakt"</label>
+    </div>
+  </div>
+
+  <div class="button-group">
+    <button onclick="downloadPDF()">Download als PDF</button>
+    <button onclick="resetChecklist()">Reset checklist</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    window.jsPDF = window.jspdf.jsPDF;
+
+    function downloadPDF() {
+      const doc = new jsPDF();
+      let y = 10;
+      const order = document.getElementById('order').value;
+      const klant = document.getElementById('klant').value;
+
+      doc.setFontSize(14);
+      doc.text("Checklist Klanttekening Verkoop", 10, y);
+      y += 10;
+      if (order || klant) {
+        doc.setFontSize(12);
+        if (order) doc.text(`Ordernummer: ${order}`, 10, y);
+        if (klant) doc.text(`Klantnaam: ${klant}`, 10, y + (order ? 7 : 0));
+        y += (order && klant) ? 14 : 7;
+      }
+
+      document.querySelectorAll('.section').forEach(section => {
+        doc.setFontSize(12);
+        const title = section.querySelector('h2').textContent;
+        doc.text(title, 10, y);
+        y += 7;
+
+        section.querySelectorAll('label').forEach(label => {
+          const checkbox = label.querySelector('input');
+          const text = checkbox.checked ? '[x] ' : '[ ] ';
+          doc.text(text + label.textContent.trim(), 12, y);
+          y += 6;
+        });
+        y += 4;
+      });
+
+      doc.save('checklist_verkoop.pdf');
+    }
+
+    function resetChecklist() {
+      document.querySelectorAll('input[type="checkbox"]').forEach(box => box.checked = false);
+      document.getElementById('order').value = '';
+      document.getElementById('klant').value = '';
+    }
+  </script>
+</body>
+</html>
