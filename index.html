@@ -110,48 +110,50 @@
     window.jsPDF = window.jspdf.jsPDF;
 
     function downloadPDF() {
-      const doc = new jsPDF();
-      let y = 10;
-      const order = document.getElementById('order').value;
-      const klant = document.getElementById('klant').value;
+  const doc = new jsPDF();
+  let y = 10;
+  const order = document.getElementById('order').value;
+  const klant = document.getElementById('klant').value;
+  const opmerkingen = document.getElementById('opmerkingen').value; // <-- deze regel is cruciaal
 
-      doc.setFontSize(14);
-      doc.text("Checklist Klanttekening Verkoop", 10, y);
-      y += 10;
-      if (order || klant) {
-        doc.setFontSize(12);
-        if (order) doc.text(`Ordernummer: ${order}`, 10, y);
-        if (klant) doc.text(`Klantnaam: ${klant}`, 10, y + (order ? 7 : 0));
-        y += (order && klant) ? 14 : 7;
-      }
+  doc.setFontSize(14);
+  doc.text("Checklist Werktekeningen", 10, y);
+  y += 10;
 
-      document.querySelectorAll('.section').forEach(section => {
-        doc.setFontSize(12);
-        const title = section.querySelector('h2').textContent;
-        doc.text(title, 10, y);
-        y += 7;
+  if (order || klant) {
+    doc.setFontSize(12);
+    if (order) doc.text(`Ordernummer: ${order}`, 10, y);
+    if (klant) doc.text(`Klantnaam: ${klant}`, 10, y + (order ? 7 : 0));
+    y += (order && klant) ? 14 : 7;
+  }
 
-        section.querySelectorAll('label').forEach(label => {
-          const checkbox = label.querySelector('input');
-          const text = checkbox.checked ? '[x] ' : '[ ] ';
-          doc.text(text + label.textContent.trim(), 12, y);
-          y += 6;
-        });
-        y += 4;
-      });
+  document.querySelectorAll('.section').forEach(section => {
+    const title = section.querySelector('h2').textContent;
+    if (title === 'Opmerkingen') return; // skip textarea
+    doc.setFontSize(12);
+    doc.text(title, 10, y);
+    y += 7;
 
-      if (opmerkingen.trim()) {
-        doc.setFontSize(12);
-        doc.text("Opmerkingen:", 10, y);
-        y += 7;
-        const splitText = doc.splitTextToSize(opmerkingen, 180);
-        doc.text(splitText, 12, y);
-      }
+    section.querySelectorAll('label').forEach(label => {
+      const checkbox = label.querySelector('input');
+      const text = checkbox.checked ? '[x] ' : '[ ] ';
+      doc.text(text + label.textContent.trim(), 12, y);
+      y += 6;
+    });
+    y += 4;
+  });
 
-      doc.save('checklist_werktekeningen.pdf');
-    }
+  if (opmerkingen.trim()) {
+    doc.setFontSize(12);
+    doc.text("Opmerkingen:", 10, y);
+    y += 7;
+    const splitText = doc.splitTextToSize(opmerkingen, 180);
+    doc.text(splitText, 12, y);
+  }
 
-
+  doc.save('checklist_werktekeningen.pdf');
+}
+    
     function resetChecklist() {
       document.querySelectorAll('input[type="checkbox"]').forEach(box => box.checked = false);
       document.getElementById('order').value = '';
